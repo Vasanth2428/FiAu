@@ -22,6 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -62,9 +63,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               a map of the fight you keep having
             </span>
           </div>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">
-            never picks a winner
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground whitespace-nowrap hidden sm:inline">
+              never picks a winner
+            </span>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

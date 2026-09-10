@@ -58,7 +58,22 @@ export interface Analysis {
   handback: Handback;
 }
 
+export const PLAIN_ENGLISH_LAYERS: Record<Layer, string> = {
+  FACT: "What happened",
+  CAUSALITY: "Why it happened",
+  VALUE: "What matters to you",
+  DEFINITION: "What that word means to you",
+  INTERPRETATION: "What it meant to you",
+  REQUEST: "What you're asking for",
+};
+
+export function getPersonName(person: Person, names?: { A?: string; B?: string }): string {
+  if (person === "A") return names?.A?.trim() || "Partner A";
+  return names?.B?.trim() || "Partner B";
+}
+
 export interface IntakeAnswers {
+  name?: string;
   whatHappened: string;
   whatIFelt: string;
   whatIMadeItMean: string;
@@ -67,6 +82,7 @@ export interface IntakeAnswers {
 
 export interface IntakeSide {
   done: boolean;
+  name?: string;
   answers: IntakeAnswers | null;
 }
 
@@ -97,4 +113,5 @@ export interface TreeResponse {
   analysis?: Analysis;
   soloConverted?: boolean;
   fixtureUsed?: boolean; // true when demo fallback engaged
+  names?: { A?: string; B?: string };
 }

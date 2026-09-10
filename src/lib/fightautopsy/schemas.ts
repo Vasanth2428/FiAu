@@ -73,6 +73,7 @@ export const AlignOutputSchema = z.object({
 });
 
 export const IntakeAnswersSchema = z.object({
+  name: z.string().optional(),
   whatHappened: z.string().min(20).max(1500),
   whatIFelt: z.string().min(20).max(1500),
   whatIMadeItMean: z.string().min(20).max(1500),

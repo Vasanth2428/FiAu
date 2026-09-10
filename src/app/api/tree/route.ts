@@ -99,11 +99,17 @@ export async function GET(req: NextRequest) {
     status = "waiting";
   }
 
+  const names = {
+    A: room.intake.A.answers?.name,
+    B: room.intake.B.answers?.name,
+  };
+
   const resp: TreeResponse = {
     status,
     analysis: room.analysis,
     soloConverted: room.soloConverted,
     fixtureUsed: room.fixtureUsed ?? false,
+    names,
   };
   return NextResponse.json(resp);
 }

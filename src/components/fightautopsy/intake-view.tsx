@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { HoldToTalk } from "./hold-to-talk";
+import { Input } from "@/components/ui/input";
 import { CRISIS_INTERSTITIAL, type SafetyResult } from "@/lib/fightautopsy/safety";
 
 interface Props {
@@ -187,6 +188,21 @@ export function IntakeView({ code, person, joinMode }: Props) {
       </div>
 
       <div className="mb-8 sm:mb-10">
+        {step === 0 && (
+          <div className="mb-6 space-y-1.5 p-4 rounded-xl bg-muted/30 border border-border/40">
+            <label htmlFor="first-name" className="text-xs text-muted-foreground font-medium block">
+              Your first name (optional)
+            </label>
+            <Input
+              id="first-name"
+              type="text"
+              value={answers.name || ""}
+              onChange={(e) => setAnswers((prev) => ({ ...prev, name: e.target.value }))}
+              placeholder="e.g. Alex"
+              className="max-w-xs text-sm bg-background"
+            />
+          </div>
+        )}
         <h2 className="font-serif text-2xl sm:text-3xl md:text-[2rem] font-normal tracking-tight leading-[1.2] mb-3 text-foreground">
           {current.title}
         </h2>
