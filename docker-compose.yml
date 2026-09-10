@@ -1,0 +1,36 @@
+services:
+  # Standard Redis — the actual data store.
+  redis:
+    image: redis:7-alpine
+    container_name: fiau_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # serverless-redis-http (SRH) — REST API proxy that @upstash/redis talks to.
+  # Exposes the same HTTP REST surface as Upstash Cloud on port 8079.
+  # Repo: https://github.com/hiett/serverless-redis-http
+  srh:
+    image: hiett/serverless-redis-http:latest
+    container_name: fiau_srh
+    restart: unless-stopped
+    ports:
+      - "8079:80"
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: local-dev-token
+      SRH_CONNECTION_STRING: redis://redis:6379
+
+volumes:
+  redis_data:

@@ -38,11 +38,7 @@ function Router() {
     body = <IntakeView code={code} person="B" joinMode />;
   } else {
     body = (
-      <LandingView
-        onStartSolo={() => router.push("?view=intake&person=A")}
-        onStartCouple={(c) => router.push(`?view=intake&code=${c}&person=A`)}
-        onJoin={(c) => router.push(`?view=join&code=${c}`)}
-      />
+      <LandingView />
     );
   }
   return <AppShell>{body}</AppShell>;

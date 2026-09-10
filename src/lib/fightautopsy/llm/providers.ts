@@ -135,6 +135,37 @@ class GeminiProvider implements LLMProvider {
   }
 }
 
+// --- Mistral provider (deploy) ---------------------------------------------
+
+class MistralProvider implements LLMProvider {
+  name = "mistral";
+  available = !!process.env.MISTRAL_API_KEY;
+  async callRaw(params: LLMCallParams): Promise<string> {
+    if (!process.env.MISTRAL_API_KEY) throw new Error("mistral: no API key");
+    const model = process.env.MISTRAL_MODEL ?? "mistral-small-latest";
+    const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${process.env.MISTRAL_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: params.messages,
+        temperature: params.temperature,
+        ...(params.json ? { response_format: { type: "json_object" } } : {}),
+      }),
+    });
+    if (!res.ok) {
+      throw new Error(`mistral: ${res.status} ${await res.text()}`);
+    }
+    const data = await res.json();
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) throw new Error("mistral: empty response");
+    return content;
+  }
+}
+
 // --- OpenRouter provider (deploy, :free models) ----------------------------
 
 class OpenRouterProvider implements LLMProvider {
@@ -173,6 +204,7 @@ const PROVIDERS: Record<string, () => LLMProvider> = {
   zai: () => new ZaiProvider(),
   groq: () => new GroqProvider(),
   gemini: () => new GeminiProvider(),
+  mistral: () => new MistralProvider(),
   openrouter: () => new OpenRouterProvider(),
 };
 

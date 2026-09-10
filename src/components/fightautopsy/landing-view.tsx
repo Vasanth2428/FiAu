@@ -8,7 +8,8 @@
 // both write separately via room-code link; neither sees the other's raw
 // words, only the map."
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -43,28 +44,18 @@ function formatRemaining(ms: number): string {
   return rem > 0 ? `${hr} hour${hr === 1 ? "" : "s"} ${rem} minute${rem === 1 ? "" : "s"}` : `${hr} hour${hr === 1 ? "" : "s"}`;
 }
 
-interface Props {
-  onStartSolo: () => void;
-  onStartCouple: (code: string) => void;
-  onJoin: (code: string) => void;
-}
-
-export function LandingView({ onStartSolo, onStartCouple, onJoin }: Props) {
+export function LandingView() {
+  const router = useRouter();
   const [joinCode, setJoinCode] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [rateLimited, setRateLimited] = useState(false);
-  const [rateLimitRemaining, setRateLimitRemaining] = useState(0);
-
-  // Check rate-limit on mount.
-  function checkRateLimit() {
-    const status = getRateLimitStatus();
-    setRateLimited(status.limited);
-    setRateLimitRemaining(status.msRemaining);
-  }
-  useEffect(() => {
-    checkRateLimit();
-  }, []);
+  const [rateLimited, setRateLimited] = useState(() => {
+    const s = getRateLimitStatus();
+    return s.limited;
+  });
+  const [rateLimitRemaining, setRateLimitRemaining] = useState(() =>
+    getRateLimitStatus().msRemaining,
+  );
 
   async function startSolo() {
     setError(null);
@@ -89,8 +80,7 @@ export function LandingView({ onStartSolo, onStartCouple, onJoin }: Props) {
       } catch {
         // ignore — advisory limit, localStorage may be blocked
       }
-      onStartSolo();
-      window.location.href = `/?view=intake&code=${code}&person=A`;
+      router.push(`?view=intake&code=${code}&person=A`);
     } catch {
       setError("Could not start a solo session. Try again.");
       setCreating(false);
@@ -120,8 +110,7 @@ export function LandingView({ onStartSolo, onStartCouple, onJoin }: Props) {
       } catch {
         // ignore
       }
-      onStartCouple(code);
-      window.location.href = `/?view=intake&code=${code}&person=A`;
+      router.push(`?view=intake&code=${code}&person=A`);
     } catch {
       setError("Could not start a couple session. Try again.");
       setCreating(false);
@@ -136,8 +125,7 @@ export function LandingView({ onStartSolo, onStartCouple, onJoin }: Props) {
       return;
     }
     setError(null);
-    onJoin(c);
-    window.location.href = `/?view=join&code=${c}`;
+    router.push(`?view=join&code=${c}`);
   }
 
   return (

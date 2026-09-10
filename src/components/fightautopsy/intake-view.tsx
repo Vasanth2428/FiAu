@@ -63,41 +63,35 @@ const DRAFT_KEY = (code: string, person: string) =>
 export function IntakeView({ code, person, joinMode }: Props) {
   const router = useRouter();
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({
-    whatHappened: "",
-    whatIFelt: "",
-    whatIMadeItMean: "",
-    whatIWant: "",
+  const [answers, setAnswers] = useState<Record<string, string>>(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY(code, person));
+      if (raw) {
+        return { whatHappened: "", whatIFelt: "", whatIMadeItMean: "", whatIWant: "", ...JSON.parse(raw) };
+      }
+    } catch {
+      // ignore
+    }
+    return {
+      whatHappened: "",
+      whatIFelt: "",
+      whatIMadeItMean: "",
+      whatIWant: "",
+    };
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [safetyBlock, setSafetyBlock] = useState<SafetyResult | null>(null);
   const [sealed, setSealed] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-
-  // Load draft from localStorage on mount.
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(DRAFT_KEY(code, person));
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        setAnswers((prev) => ({ ...prev, ...parsed }));
-      }
-    } catch {
-      // ignore
-    }
-    setLoaded(true);
-  }, [code, person]);
 
   // Autosave draft on change.
   useEffect(() => {
-    if (!loaded) return;
     try {
       localStorage.setItem(DRAFT_KEY(code, person), JSON.stringify(answers));
     } catch {
       // ignore
     }
-  }, [answers, code, person, loaded]);
+  }, [answers, code, person]);
 
   const current = STEPS[step];
   const value = answers[current.key];
